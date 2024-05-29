@@ -1,0 +1,45 @@
+import requests
+
+# 서울교통공사 API 엔드포인트
+API_ENDPOINT = "http://swopenAPI.seoul.go.kr/api/subway/48587a49706c6f61313036614347446a/json/realtimeStationArrival/0/5/"
+
+# API 키
+API_KEY = "48587a49706c6f61313036614347446a"
+
+def get_train_arrival_times(station_name):
+    # API 요청 URL 생성
+    url = API_ENDPOINT + station_name
+    print(f"Request URL: {url}")  # 디버깅을 위한 URL 출력
+
+    # API 요청
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        print(f"Response data: {data}")  # 응답 데이터 출력
+
+        # JSON 데이터 파싱
+        if 'realtimeArrivalList' in data:
+            arrival_times = data['realtimeArrivalList']
+            return arrival_times
+        else:
+            print("No arrival data found")
+            return None
+    else:
+        print(f"Failed to get data from API. Status code: {response.status_code}")
+        return None
+
+def display_arrival_times(arrival_times):
+    print(f"{'열차 번호':<10}{'방향':<10}{'도착 예정 시간':<20}{'도착 열차 정보':<30}")
+    print("="*70)
+    for train in arrival_times:
+        print(f"{train['btrainNo']:<10}{train['updnLine']:<10}{train['arvlMsg2']:<20}{train['arvlMsg3']:<30}")
+
+if __name__ == "__main__":
+    station_name = "시청"
+    arrival_times = get_train_arrival_times(station_name)
+
+    if arrival_times:
+        display_arrival_times(arrival_times)
+    else:
+        print("No arrival times available.")
